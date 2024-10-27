@@ -1,7 +1,6 @@
 package com.example.MovieBooking.Controller;
 
-import com.example.MovieBooking.DTO.ShowDTO;
-import com.example.MovieBooking.Entity.Show;
+import com.example.MovieBooking.DTO.ShowDTOForBooking;
 import com.example.MovieBooking.ServiceImpl.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +21,14 @@ public class ShowController {
     private BookingService bookingService;
 
     @PostMapping("/{id}/book")
-    public ResponseEntity<ShowDTO> bookTicket(@PathVariable Long id) {
-        Optional<ShowDTO> show = bookingService.bookTicket(id);
+    public ResponseEntity<ShowDTOForBooking> bookTicket(@PathVariable Long id) {
+        Optional<ShowDTOForBooking> show = bookingService.bookTicket(id);
         return show.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<ShowDTO> cancelTicket(@PathVariable Long id) {
-        Optional<ShowDTO> show = bookingService.cancelTicket(id);
+    public ResponseEntity<ShowDTOForBooking> cancelTicket(@PathVariable Long id) {
+        Optional<ShowDTOForBooking> show = bookingService.cancelTicket(id);
         return show.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

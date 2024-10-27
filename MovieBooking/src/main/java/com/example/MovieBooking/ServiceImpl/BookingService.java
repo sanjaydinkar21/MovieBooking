@@ -1,7 +1,6 @@
 package com.example.MovieBooking.ServiceImpl;
 
-import com.example.MovieBooking.DTO.MovieDTO;
-import com.example.MovieBooking.DTO.ShowDTO;
+import com.example.MovieBooking.DTO.*;
 import com.example.MovieBooking.Entity.Movie;
 import com.example.MovieBooking.Entity.Show;
 import com.example.MovieBooking.Exception.MovieNotFoundException;
@@ -29,17 +28,25 @@ public class BookingService {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy hh:mm a");
 
-    public List<MovieDTO> getAllMovies() {
-        return movieRepository.findAll().stream().map(this::convertToMovieDTO).collect(Collectors.toList());
+//    public List<MovieDTO> getAllMovies() {
+//        return movieRepository.findAll().stream().map(this::convertToMovieDTO).collect(Collectors.toList());
+//    }
+//
+//    public Optional<MovieDTO> getMovieById(Long id) {
+//        return movieRepository.findById(id).map(this::convertToMovieDTO);
+//    }
+
+    public List<MovieDTOForAll> getAllMovies() {
+        return movieRepository.findAll().stream().map(this::convertToMovieDTOForAll).collect(Collectors.toList());
     }
 
-    public Optional<MovieDTO> getMovieById(Long id) {
-        return Optional.ofNullable(movieRepository.findById(id).map(this::convertToMovieDTO)
+    public Optional<MovieDTOForAll> getMovieById(Long id) {
+        return Optional.ofNullable(movieRepository.findById(id).map(this::convertToMovieDTOForAll)
                 .orElseThrow(() -> new MovieNotFoundException("Movie not found with id " + id)));
     }
 
     @Transactional
-    public Optional<ShowDTO> bookTicket(Long showId) {
+    public Optional<ShowDTOForBooking> bookTicket(Long showId) {
         Show show = showRepository.findById(showId)
                 .orElseThrow(() -> new ShowNotFoundException("Show not found with id " + showId));
         if (show.getAvailableSeats() > 0) {
@@ -47,19 +54,19 @@ public class BookingService {
             show.getBookedSeats().add(nextSeat);
             show.setAvailableSeats(show.getAvailableSeats() - 1);
             showRepository.save(show);
-            ShowDTO showDTO = convertToShowDTO(show);
+            ShowDTOForBooking showDTO = convertToShowDTOForBooking(show);
             showDTO.setStatus("Booked");
             showDTO.setSeatNumber(nextSeat);
             return Optional.of(showDTO);
         } else {
-            ShowDTO showDTO = new ShowDTO();
+            ShowDTOForBooking showDTO = new ShowDTOForBooking();
             showDTO.setStatus("Failed");
             return Optional.of(showDTO);
         }
     }
 
     @Transactional
-    public Optional<ShowDTO> cancelTicket(Long showId) {
+    public Optional<ShowDTOForBooking> cancelTicket(Long showId) {
         Show show = showRepository.findById(showId)
                 .orElseThrow(() -> new ShowNotFoundException("Show not found with id " + showId));
         show.setAvailableSeats(show.getAvailableSeats() + 1);
@@ -67,7 +74,7 @@ public class BookingService {
             show.getBookedSeats().remove(show.getBookedSeats().size() - 1);
         }
         showRepository.save(show);
-        ShowDTO showDTO = convertToShowDTO(show);
+        ShowDTOForBooking showDTO = convertToShowDTOForBooking(show);
         showDTO.setStatus("Cancelled");
         return Optional.of(showDTO);
     }
@@ -102,11 +109,37 @@ public class BookingService {
         return showDTO;
     }
 
+    private ShowDTOForBooking convertToShowDTOForBooking(Show show) {
+        ShowDTOForBooking showDTO = new ShowDTOForBooking();
+        showDTO.setId(show.getId());
+        showDTO.setShowTime(show.getShowTime());
+        showDTO.setAvailableSeats(show.getAvailableSeats());
+        showDTO.setBookedSeats(show.getBookedSeats());
+        return showDTO;
+    }
+
     private Show convertToShow(ShowDTO showDTO) {
         Show show = new Show();
-        show.setShowTime(LocalDateTime.parse(showDTO.getShowTime().format(formatter), formatter)); // Parse LocalDateTime correctly
+        show.setShowTime(showDTO.getShowTime()); // Set LocalDateTime directly
         show.setAvailableSeats(showDTO.getAvailableSeats());
         show.setBookedSeats(showDTO.getBookedSeats());
         return show;
+    }
+    private MovieDTOForAll convertToMovieDTOForAll(Movie movie) {
+        MovieDTOForAll movieDTO = new MovieDTOForAll();
+        movieDTO.setId(movie.getId());
+        movieDTO.setTitle(movie.getTitle());
+        movieDTO.setGenre(movie.getGenre());
+        movieDTO.setShows(movie.getShows().stream().map(this::convertToShowDTOForAll).collect(Collectors.toList()));
+        return movieDTO;
+    }
+
+    private ShowDTOForAll convertToShowDTOForAll(Show show) {
+        ShowDTOForAll showDTO = new ShowDTOForAll();
+        showDTO.setId(show.getId());
+        showDTO.setShowTime(show.getShowTime());
+        showDTO.setAvailableSeats(show.getAvailableSeats());
+        showDTO.setBookedSeats(show.getBookedSeats());
+        return showDTO;
     }
 }

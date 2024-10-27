@@ -1,6 +1,7 @@
 package com.example.MovieBooking.Controller;
 
 import com.example.MovieBooking.DTO.MovieDTO;
+import com.example.MovieBooking.DTO.MovieDTOForAll;
 import com.example.MovieBooking.Entity.Movie;
 import com.example.MovieBooking.ServiceImpl.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +22,13 @@ public class MovieController {
     private BookingService bookingService;
 
     @GetMapping("/getAll")
-    public List<MovieDTO> getAllMovies() {
+    public List<MovieDTOForAll> getAllMovies() {
         return bookingService.getAllMovies();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MovieDTO> getMovieById(@PathVariable Long id) {
-        Optional<MovieDTO> movie = bookingService.getMovieById(id);
+    public ResponseEntity<MovieDTOForAll> getMovieById(@PathVariable Long id) {
+        Optional<MovieDTOForAll> movie = bookingService.getMovieById(id);
         return movie.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
