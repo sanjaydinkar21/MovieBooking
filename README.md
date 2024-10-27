@@ -36,4 +36,4 @@
 
 ## Additional Information
 
-- Swagger UI is available at `http://localhost:8000/swagger-ui/`.
+- Swagger UI is available at `http://localhost:8000/swagger-ui/index.html#/`.
