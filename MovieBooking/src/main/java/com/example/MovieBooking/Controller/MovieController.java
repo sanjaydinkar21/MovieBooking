@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/movies")
+@RequestMapping("/v1/movies")
 @Validated
 public class MovieController {
 
@@ -26,8 +26,8 @@ public class MovieController {
         return bookingService.getAllMovies();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MovieDTOForAll> getMovieById(@PathVariable Long id) {
+    @GetMapping("/{movieId}")
+    public ResponseEntity<MovieDTOForAll> getMovieById(@PathVariable("movieId") Long id) {
         Optional<MovieDTOForAll> movie = bookingService.getMovieById(id);
         return movie.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -37,5 +37,11 @@ public class MovieController {
         Movie savedMovie = bookingService.saveMovie(movie);
         MovieDTO movieDTO = bookingService.convertToMovieDTO(savedMovie);
         return new ResponseEntity<>(movieDTO, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{movieId}")
+    public ResponseEntity<String> deleteMovieById(@PathVariable("movieId") Long id) {
+        bookingService.deleteMovieById(id);
+        return ResponseEntity.ok("Deleted movie with ID: " + id);
     }
 }

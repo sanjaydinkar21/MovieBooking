@@ -49,35 +49,54 @@ public class BookingService {
     public Optional<ShowDTOForBooking> bookTicket(Long showId) {
         Show show = showRepository.findById(showId)
                 .orElseThrow(() -> new ShowNotFoundException("Show not found with id " + showId));
-        if (show.getAvailableSeats() > 0) {
-            int nextSeat = show.getBookedSeats().size() + 1;
-            show.getBookedSeats().add(nextSeat);
-            show.setAvailableSeats(show.getAvailableSeats() - 1);
-            showRepository.save(show);
-            ShowDTOForBooking showDTO = convertToShowDTOForBooking(show);
-            showDTO.setStatus("Booked");
-            showDTO.setSeatNumber(nextSeat);
-            return Optional.of(showDTO);
-        } else {
-            ShowDTOForBooking showDTO = new ShowDTOForBooking();
-            showDTO.setStatus("Failed");
-            return Optional.of(showDTO);
+
+        if (show.getAvailableSeats() == 0) {
+            throw new IllegalArgumentException("All seats are booked");
         }
+
+        int nextSeat = show.getBookedSeats().size() + 1;
+        show.getBookedSeats().add(nextSeat);
+        show.setAvailableSeats(show.getAvailableSeats() - 1);
+        showRepository.save(show);
+
+        ShowDTOForBooking showDTO = convertToShowDTOForBooking(show);
+        showDTO.setStatus("Booked");
+        showDTO.setSeatNumber(nextSeat);
+        return Optional.of(showDTO);
     }
 
     @Transactional
     public Optional<ShowDTOForBooking> cancelTicket(Long showId) {
         Show show = showRepository.findById(showId)
                 .orElseThrow(() -> new ShowNotFoundException("Show not found with id " + showId));
-        show.setAvailableSeats(show.getAvailableSeats() + 1);
-        if (!show.getBookedSeats().isEmpty()) {
-            show.getBookedSeats().remove(show.getBookedSeats().size() - 1);
+
+        if (show.getBookedSeats().isEmpty()) {
+            throw new IllegalArgumentException("You are trying to cancel an available seat");
         }
+
+        show.setAvailableSeats(show.getAvailableSeats() + 1);
+        show.getBookedSeats().remove(show.getBookedSeats().size() - 1);
         showRepository.save(show);
+
         ShowDTOForBooking showDTO = convertToShowDTOForBooking(show);
         showDTO.setStatus("Cancelled");
         return Optional.of(showDTO);
     }
+//
+//    @Transactional
+//    public Optional<ShowDTOForBooking> cancelTicket(Long showId) {
+//        return Optional.empty();
+////        Show show = showRepository.findById(showId)
+////                .orElseThrow(() -> new ShowNotFoundException("Show not found with id " + showId));
+////        show.setAvailableSeats(show.getAvailableSeats() + 1);
+////        if (!show.getBookedSeats().isEmpty()) {
+////            show.getBookedSeats().remove(show.getBookedSeats().size() - 1);
+////        }
+////        showRepository.save(show);
+////        ShowDTOForBooking showDTO = convertToShowDTOForBooking(show);
+////        showDTO.setStatus("Cancelled");
+////        return Optional.of(showDTO);
+//    }
 
     @Transactional
     public Movie saveMovie(MovieDTO movieDTO) {
@@ -90,7 +109,21 @@ public class BookingService {
         }
         return movieRepository.save(movie);
     }
+    @Transactional
+    public void deleteShowById(Long showId) {
+        if (!showRepository.existsById(showId)) {
+            throw new ShowNotFoundException("Show not found with id " + showId);
+        }
+        showRepository.deleteById(showId);
+    }
 
+    @Transactional
+    public void deleteMovieById(Long movieId) {
+        if (!movieRepository.existsById(movieId)) {
+            throw new MovieNotFoundException("Movie not found with id " + movieId);
+        }
+        movieRepository.deleteById(movieId);
+    }
     public MovieDTO convertToMovieDTO(Movie movie) {
         MovieDTO movieDTO = new MovieDTO();
         movieDTO.setId(movie.getId());
