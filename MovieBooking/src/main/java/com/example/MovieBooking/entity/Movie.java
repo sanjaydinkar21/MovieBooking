@@ -1,4 +1,4 @@
-package com.example.MovieBooking.Entity;
+package com.example.MovieBooking.entity;
 
 import lombok.*;
 import jakarta.persistence.*;

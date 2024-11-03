@@ -1,19 +1,18 @@
-package com.example.MovieBooking.DTO;
+package com.example.MovieBooking.dto;
 
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class ShowDTOForBooking {
+public class ShowDTOForAll {
     private Long id;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MMMM dd, yyyy hh:mm a")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMM yyyy, HH:mm")
     private LocalDateTime showTime;
 
     private int availableSeats;
     private List<Integer> bookedSeats;
-    private String status;
-    private Integer seatNumber;
 }

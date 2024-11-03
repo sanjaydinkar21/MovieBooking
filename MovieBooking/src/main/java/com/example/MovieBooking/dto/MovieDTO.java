@@ -1,4 +1,4 @@
-package com.example.MovieBooking.DTO;
+package com.example.MovieBooking.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.Data;

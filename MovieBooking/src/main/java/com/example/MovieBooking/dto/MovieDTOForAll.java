@@ -1,4 +1,4 @@
-package com.example.MovieBooking.DTO;
+package com.example.MovieBooking.dto;
 
 import lombok.Data;
 import java.util.List;
