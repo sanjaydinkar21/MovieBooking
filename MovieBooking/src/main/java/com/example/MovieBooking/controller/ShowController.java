@@ -2,7 +2,6 @@ package com.example.MovieBooking.controller;
 
 import com.example.MovieBooking.dto.ShowDTOForBooking;
 import com.example.MovieBooking.service.ShowService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +20,13 @@ public class ShowController {
         this.showService = showService;
     }
 
-    @PostMapping("/{showId}/book")
+    @PostMapping("/booking-show/{showId}")
     public ResponseEntity<ShowDTOForBooking> bookTicket(@PathVariable("showId") Long id) {
         Optional<ShowDTOForBooking> show = showService.bookTicket(id);
         return show.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{showId}/cancel")
+    @PostMapping("/cancel-show/{showId}")
     public ResponseEntity<ShowDTOForBooking> cancelTicket(@PathVariable("showId") Long id) {
         Optional<ShowDTOForBooking> show = showService.cancelTicket(id);
         return show.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

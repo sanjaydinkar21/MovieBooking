@@ -25,7 +25,7 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    @GetMapping("/getAll")
+    @GetMapping
     public List<MovieDTOForAll> getAllMovies() {
         return movieService.getAllMovies();
     }
@@ -36,7 +36,7 @@ public class MovieController {
         return movie.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/addMovie")
+    @PostMapping
     public ResponseEntity<MovieDTO> addMovie(@RequestBody MovieDTO movie) {
         Movie savedMovie = movieService.saveMovie(movie);
         MovieDTO movieDTO = MovieMapper.convertToMovieDTO(savedMovie);
